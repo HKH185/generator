@@ -1,0 +1,17 @@
+#*{basePackageName}/{moduleName}/{daoName}/{ClassName}Dao.java*#
+package ${packageName}.dao;
+
+import ${packageName}.${entityName}.${ClassName};
+import java.util.List;
+import com.tobo.common.mapper.BaseDao;
+
+/**
+ * ${functionName}dao接口
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Dao extends BaseDao<${ClassName},${pkColumn.javaJavaType}>
+{
+
+}

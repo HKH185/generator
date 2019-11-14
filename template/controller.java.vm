@@ -1,0 +1,30 @@
+#*{basePackageName}/{moduleName}/{controllerName}/{ClassName}Controller.java*#
+package ${basePackage}.web.controller.${moduleName};
+
+import com.tobo.common.service.BaseService;
+import com.tobo.common.web.controller.BaseController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.annotation.Resource;
+import ${packageName}.${entityName}.${ClassName};
+import ${packageName}.service.${ClassName}Service;
+
+
+/**
+ * ${functionName}操作控制器
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("/${tableNamePrefix1}/${tableNamePrefix2}")
+public class ${ClassName}Controller extends BaseController<${ClassName},${pkColumn.javaJavaType}>
+{
+    @Resource
+    private ${ClassName}Service ${className}Service;
+    @Override
+    public BaseService<${ClassName},${pkColumn.javaJavaType}> getService() {
+        return ${className}Service;
+    }
+}

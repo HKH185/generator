@@ -1,0 +1,64 @@
+#*{basePackageName}/{moduleName}/{entityName}/{ClassName}.java*#
+package ${packageName}.${entityName};
+
+import com.tobo.common.entity.BaseEntity;
+import java.sql.Date;
+import java.sql.Timestamp;
+import lombok.Getter;
+import lombok.Setter;
+#foreach ($import in $importList)
+import ${import};
+#end
+
+/**
+ * ${functionName}对象 ${tableName}
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Getter
+@Setter
+public class ${ClassName} extends BaseEntity<${pkColumn.javaJavaType}>
+{
+    private static final long serialVersionUID = 1L;
+
+#foreach ($column in $columns)
+#if($column.javaField != ${pkColumn.javaField})
+#if(!$column.superColumn)
+    /** $column.columnComment */
+#if($column.list)
+#set($parentheseIndex=$column.columnComment.indexOf("（"))
+#if($parentheseIndex != -1)
+#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#else
+#set($comment=$column.columnComment)
+#end
+#if($parentheseIndex != -1)
+    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+#elseif($column.javaJavaType == 'Date')
+    @Excel(name = "${comment}", width = 30, dateFormat = "yyyy-MM-dd")
+#else
+    @Excel(name = "${comment}")
+#end
+#end
+    private $column.javaJavaType $column.javaField;
+#end
+#end
+#end
+###foreach ($column in $columns)
+###if(!$column.superColumn)
+###set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+##    public void set${AttrName}($column.javaJavaType $column.javaField)
+##    {
+##        this.$column.javaField = $column.javaField;
+##    }
+##
+##    public $column.javaJavaType get${AttrName}()
+##    {
+##        return $column.javaField;
+##    }
+###end
+###end
+
+
+}

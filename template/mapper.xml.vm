@@ -1,0 +1,131 @@
+#*{basePackageName}/{moduleName}/{xmlName}/{ClassName}Mapper.xml*#
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.dao.${ClassName}Dao">
+    
+    <resultMap type="${packageName}.${entityName}.${ClassName}" id="BaseResultMap">
+#foreach ($column in $columns)
+        <result column="${column.columnName}" property="${column.javaField}"  jdbcType="${column.xmlJDBCType}" />
+#end
+#if($table.tree)
+        <result property="parentName" column="parent_name" />
+#end
+    </resultMap>
+    <sql id="Base_Column_List" >
+        #foreach($column in $columns) $column.columnName#if($velocityCount != $columns.size()),#end#end
+    </sql>
+
+
+    <sql id="condition" >
+        <if test="null!=params" >
+#foreach($column in $columns)
+#if($column.xmlJDBCType == 'TIMESTAMP' && $column.columnName=='create_time')
+                    <if test="null!=params.createTime1 and ''!=params.createTime1">
+                        <![CDATA[
+                        and  DATE_FORMAT(create_time, '%Y-%m-%d') >=  DATE_FORMAT(#{params.createTime1}, '%Y-%m-%d')
+                        ]]>
+                    </if>
+                    <if test="null!=params.createTime2 and ''!=params.createTime2">
+                        <![CDATA[
+                        and  DATE_FORMAT(create_time, '%Y-%m-%d') <=  DATE_FORMAT(#{params.createTime2}, '%Y-%m-%d')
+                        ]]>
+                    </if>
+#end
+#if($column.xmlJDBCType == 'TIMESTAMP' && $column.columnName=='modify_time')
+                    <if test="null!=params.modifyTime1 and ''!=params.modifyTime1">
+                        <![CDATA[
+                        and  DATE_FORMAT(modify_time, '%Y-%m-%d') >=  DATE_FORMAT(#{params.modifyTime1}, '%Y-%m-%d')
+                        ]]>
+                    </if>
+                    <if test="null!=params.modifyTime2 and ''!=params.modifyTime2">
+                        <![CDATA[
+                        and  DATE_FORMAT(modify_time, '%Y-%m-%d') <=  DATE_FORMAT(#{params.modifyTime2}, '%Y-%m-%d')
+                        ]]>
+                    </if>
+#end
+#if($column.xmlJDBCType != 'TIMESTAMP')
+                    <if test="null!=params.$column.javaField and ''!=params.$column.javaField">and $column.columnName like concat('%',#{params.$column.javaField},'%')</if>
+#end
+#end
+        </if>
+    </sql>
+    <select id="findById" resultMap="BaseResultMap" parameterType="${pkColumn.xmlJavaType}">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE 1=1
+        and  ${pkColumn.columnName} = #{${pkColumn.javaField},jdbcType=${pkColumn.xmlJDBCType}}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE 1=1
+    </select>
+
+    <select id="findByParams" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE 1=1
+        <include refid="condition" />
+    </select>
+
+    <select id="findByPage" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE 1=1
+        <include refid="condition" />
+        <if test="orderByField == null or ''==orderByField" >
+            ORDER BY create_time desc
+        </if>
+        <if test="orderByField != null and ''!=orderByField" >
+            ORDER BY ${orderByField}
+            <if test="orderByField" >
+                ${orderBy}
+            </if>
+        </if>
+    </select>
+
+
+    <insert id="insert" parameterType="${packageName}.${entityName}.${ClassName}">
+        INSERT INTO ${tableName}
+        (
+#foreach($column in $columns)
+    $column.columnName#if($velocityCount != $columns.size()),#end
+#end) VALUES (
+#foreach($column in $columns)
+                    #{$column.javaField,jdbcType=$column.xmlJDBCType}#if($velocityCount != $columns.size()),#end
+#end)
+    </insert>
+
+    <delete id="deleteById" parameterType="${pkColumn.xmlJavaType}" >
+        DELETE FROM ${tableName}
+        WHERE ${pkColumn.columnName} = #{${pkColumn.javaField},jdbcType=${pkColumn.xmlJDBCType}}
+    </delete>
+
+
+
+    <update id="updateById" parameterType="${packageName}.${entityName}.${ClassName}" >
+        UPDATE ${tableName}
+        SET
+#foreach($column in $columns)
+                $column.columnName = #{$column.javaField,jdbcType=$column.xmlJDBCType}#if($velocityCount != $columns.size()),#end
+#end
+        WHERE ${pkColumn.columnName} = #{${pkColumn.javaField},jdbcType=${pkColumn.xmlJDBCType}}
+    </update>
+
+    <update id="updateByIdSelective" parameterType="${packageName}.${entityName}.${ClassName}" >
+        UPDATE ${tableName}
+        <set >
+#foreach($column in $columns)
+                <if test="$column.javaField != null" >$column.columnName = #{$column.javaField,jdbcType=$column.xmlJDBCType}#if($velocityCount != $columns.size()),#end</if>
+#end
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

@@ -1,0 +1,29 @@
+#*{basePackageName}/{moduleName}/{serviceName}/{ClassName}Service.java*#
+package ${packageName}.service;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ${packageName}.dao.${ClassName}Dao;
+import ${packageName}.${entityName}.${ClassName};
+import com.tobo.common.mapper.BaseDao;
+import com.tobo.common.service.BaseService;
+import javax.annotation.Resource;
+
+/**
+ * ${functionName}Service业务层处理
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service("${className}Service")
+public class ${ClassName}Service extends BaseService<${ClassName},${pkColumn.javaJavaType}>
+{
+    @Resource
+    private ${ClassName}Dao ${className}Dao;
+
+    @Override
+    public BaseDao init() {
+        return ${className}Dao;
+    }
+}
